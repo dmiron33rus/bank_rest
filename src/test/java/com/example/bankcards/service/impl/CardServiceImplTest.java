@@ -178,8 +178,8 @@ class CardServiceImplTest {
         to.setStatus(CardStatus.ACTIVE);
         to.setBalance(new BigDecimal("50.00"));
 
-        when(cardRepository.findById(101L)).thenReturn(Optional.of(from));
-        when(cardRepository.findById(102L)).thenReturn(Optional.of(to));
+        when(cardRepository.findByIdAndOwnerId(1L, 101L)).thenReturn(Optional.of(from));
+        when(cardRepository.findByIdAndOwnerId(1L, 102L)).thenReturn(Optional.of(to));
 
         cardService.transfer(1L, new TransferDto(101L,
                 102L,
@@ -188,8 +188,8 @@ class CardServiceImplTest {
         assertEquals(new BigDecimal("40.00"), from.getBalance());
         assertEquals(new BigDecimal("110.00"), to.getBalance());
 
-        verify(cardRepository).findById(101L);
-        verify(cardRepository).findById(102L);
+        verify(cardRepository).findByIdAndOwnerId(1L, 101L);
+        verify(cardRepository).findByIdAndOwnerId(1L, 102L);
         verify(cardRepository).save(from);
         verify(cardRepository).save(to);
         verifyNoMoreInteractions(cardRepository);
@@ -226,18 +226,18 @@ class CardServiceImplTest {
         to.setStatus(CardStatus.ACTIVE);
         to.setBalance(new BigDecimal("50.00"));
 
-        when(cardRepository.findById(101L)).thenReturn(Optional.of(from));
-        when(cardRepository.findById(102L)).thenReturn(Optional.of(to));
+        when(cardRepository.findByIdAndOwnerId(1L, 101L)).thenReturn(Optional.of(from));
+        when(cardRepository.findByIdAndOwnerId(1L, 102L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> cardService.transfer(1L,
                 new TransferDto(101L,
                         102L,
                         new BigDecimal("10.00"))))
-                .isInstanceOf(ForbiddenOperationException.class)
-                .hasMessageContaining("Перевод только между своими картами");
+                .isInstanceOf(CardNotFoundException.class) // 🔧 Изменилось исключение!
+                .hasMessageContaining("Карта не найдена");
 
-        verify(cardRepository).findById(101L);
-        verify(cardRepository).findById(102L);
+        verify(cardRepository).findByIdAndOwnerId(1L, 101L);
+        verify(cardRepository).findByIdAndOwnerId(1L, 102L);
         verifyNoMoreInteractions(cardRepository);
         verifyNoInteractions(userRepository);
     }
@@ -266,8 +266,8 @@ class CardServiceImplTest {
         to.setStatus(CardStatus.ACTIVE);
         to.setBalance(new BigDecimal("50.00"));
 
-        when(cardRepository.findById(101L)).thenReturn(Optional.of(from));
-        when(cardRepository.findById(102L)).thenReturn(Optional.of(to));
+        when(cardRepository.findByIdAndOwnerId(1L, 101L)).thenReturn(Optional.of(from));
+        when(cardRepository.findByIdAndOwnerId(1L, 102L)).thenReturn(Optional.of(to));
 
         assertThatThrownBy(() -> cardService.transfer(1L,
                 new TransferDto(101L,
@@ -276,8 +276,8 @@ class CardServiceImplTest {
                 .isInstanceOf(InsufficientFundsException.class)
                 .hasMessageContaining("Недостаточно средств");
 
-        verify(cardRepository).findById(101L);
-        verify(cardRepository).findById(102L);
+        verify(cardRepository).findByIdAndOwnerId(1L, 101L);
+        verify(cardRepository).findByIdAndOwnerId(1L, 102L);
         verifyNoMoreInteractions(cardRepository);
         verifyNoInteractions(userRepository);
     }

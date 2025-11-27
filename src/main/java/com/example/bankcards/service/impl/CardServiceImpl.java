@@ -52,7 +52,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public CardDto createCard(CreateCardDto cardDto) {
-        log.debug("Добавление карты: {}", cardDto );
+        log.debug("Добавление карты для пользователя: {}", cardDto.ownerId());
         var card = new Card();
         card.setOwner(userRepository.findById(cardDto.ownerId())
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден")));
@@ -65,7 +65,7 @@ public class CardServiceImpl implements CardService {
         card.setBalance(cardDto.balance());
         var savedCard = cardRepository.save(card);
         String masked = CardMasker.mask(cardDto.number());
-        log.debug("Карта добавлена");
+        log.debug("Карта успешно создана: {}", savedCard.getId());
         return new CardDto(savedCard.getId(), savedCard.getOwner().getId(),
                 masked, savedCard.getStatus(), savedCard.getBalance());
     }
@@ -131,13 +131,10 @@ public class CardServiceImpl implements CardService {
         if (dto.amount() == null || dto.amount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidTransferException("Сумма должна быть больше 0");
         }
-        var from = cardRepository.findById(dto.fromCardId())
+        var from = cardRepository.findByIdAndOwnerId(userId, dto.fromCardId())
                 .orElseThrow(() -> new CardNotFoundException("Карта не найдена"));
-        var to = cardRepository.findById(dto.toCardId())
+        var to = cardRepository.findByIdAndOwnerId(userId, dto.toCardId())
                 .orElseThrow(() -> new CardNotFoundException("Карта не найдена"));
-        if (!(from.getOwner().getId().equals(userId) && to.getOwner().getId().equals(userId))) {
-            throw new ForbiddenOperationException("Перевод только между своими картами");
-        }
         if (from.getStatus() != CardStatus.ACTIVE || to.getStatus() != CardStatus.ACTIVE) {
             throw new InvalidTransferException("Обе карты должны быть активированы");
         }

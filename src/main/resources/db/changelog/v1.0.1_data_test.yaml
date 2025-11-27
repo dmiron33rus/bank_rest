@@ -1,11 +1,19 @@
 databaseChangeLog:
   - changeSet:
-      id: 2-add-test-data
+      id: 4-add-test-users
       author: you
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT COUNT(*) FROM users WHERE username IN ('admin', 'user')
       changes:
         - insert:
             tableName: users
             columns:
+              - column:
+                  name: id
+                  value: 1
               - column:
                   name: username
                   value: "admin"
@@ -20,6 +28,9 @@ databaseChangeLog:
             tableName: users
             columns:
               - column:
+                  name: id
+                  value: 2
+              - column:
                   name: username
                   value: "user"
               - column:
@@ -29,15 +40,27 @@ databaseChangeLog:
                   name: role
                   value: "USER"
 
+  - changeSet:
+      id: 5-add-test-cards
+      author: you
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT COUNT(*) FROM cards WHERE card_number IN ('4111111111110001', '5555444433331111', '5555444433332222')
+      changes:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  value: 1
               - column:
                   name: card_number
                   value: "4111111111110001"
               - column:
                   name: owner_id
-                  valueComputed: (SELECT id FROM users WHERE username = 'admin')
+                  value: 1
               - column:
                   name: expiration_date
                   value: "2030-12-31"
@@ -52,11 +75,14 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  value: 2
+              - column:
                   name: card_number
                   value: "5555444433331111"
               - column:
                   name: owner_id
-                  valueComputed: (SELECT id FROM users WHERE username = 'user')
+                  value: 2
               - column:
                   name: expiration_date
                   value: "2028-06-30"
@@ -71,11 +97,14 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  value: 3
+              - column:
                   name: card_number
                   value: "5555444433332222"
               - column:
                   name: owner_id
-                  valueComputed: (SELECT id FROM users WHERE username = 'user')
+                  value: 2
               - column:
                   name: expiration_date
                   value: "2029-05-31"

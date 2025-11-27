@@ -1,5 +1,6 @@
 C:\Users\Meshok\IdeaProjects\bank_rest\src\main\java\com\example\bankcards\BankRestApplication.java
-C:\Users\Meshok\IdeaProjects\bank_rest\src\main\java\com\example\bankcards\config\PasswordEncoder.java
+C:\Users\Meshok\IdeaProjects\bank_rest\src\main\java\com\example\bankcards\config\CorsConfig.java
+C:\Users\Meshok\IdeaProjects\bank_rest\src\main\java\com\example\bankcards\config\PasswordEncoderConfig.java
 C:\Users\Meshok\IdeaProjects\bank_rest\src\main\java\com\example\bankcards\controller\AdminCardController.java
 C:\Users\Meshok\IdeaProjects\bank_rest\src\main\java\com\example\bankcards\controller\AdminUserController.java
 C:\Users\Meshok\IdeaProjects\bank_rest\src\main\java\com\example\bankcards\controller\AuthController.java
